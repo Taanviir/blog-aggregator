@@ -3,9 +3,14 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/Taanviir/blog-aggregator/internal/config"
 )
+
+type state struct {
+	cfg *config.Config
+}
 
 func main() {
 	cfg, err := config.Read()
@@ -14,14 +19,26 @@ func main() {
 	}
 	fmt.Printf("Read config: %+v\n", cfg)
 
-	err = cfg.SetUser("tanvir")
-	if err != nil {
-		log.Fatalf("error setting user: %v", err)
+	s := &state{
+		cfg: &cfg,
 	}
 
-	cfg, err = config.Read()
-	if err != nil {
-		log.Fatalf("error reading config: %v", err)
+	cmds := &commands{
+		handlers: make(map[string]func(*state, command) error),
 	}
-	fmt.Printf("Read config: %+v\n", cfg)
+	cmds.register("login", handlerLogin)
+
+	if len(os.Args) < 2 {
+		log.Fatalf("Usage: ./blog-aggregator <command> <args>")
+	}
+
+	cmd := command{
+		name: os.Args[1],
+		args: os.Args[2:],
+	}
+
+	err = cmds.run(s, cmd)
+    if err != nil {
+        log.Fatal(err)
+    }
 }
