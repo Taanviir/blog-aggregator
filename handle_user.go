@@ -23,7 +23,7 @@ func handlerLogin(s *state, cmd command) error {
 
 	err = s.cfg.SetUser(user.Name)
 	if err != nil {
-		return fmt.Errorf("couldn't set current user: %w", err)
+		return fmt.Errorf("failed to set current user: %w", err)
 	}
 
 	fmt.Printf("User %s has been set\n", user.Name)
@@ -50,11 +50,11 @@ func handlerRegister(s *state, cmd command) error {
 
 	err = s.cfg.SetUser(user.Name)
 	if err != nil {
-		return fmt.Errorf("couldn't set current user: %w", err)
+		return fmt.Errorf("failed to set current user: %w", err)
 	}
 
-	fmt.Printf("User %s has been registered\n", user.Name)
-	fmt.Printf("User:%v\n", user)
+	fmt.Println("User has been registered successfully")
+	fmt.Printf("ID: %v, Name: %s\n", user.ID, user.Name)
 
 	return nil
 }
@@ -66,10 +66,31 @@ func handlerReset(s *state, cmd command) error {
 
 	err := s.db.ResetUsers(context.Background())
 	if err != nil {
-		return fmt.Errorf("couldn't reset users: %w", err)
+		return fmt.Errorf("failed to reset users: %w", err)
 	}
 
 	fmt.Println("users table successfully reset")
+
+	return nil
+}
+
+func handlerUsers(s *state, cmd command) error {
+	if len(cmd.Args) != 0 {
+		return fmt.Errorf("usage: %s", cmd.Name)
+	}
+
+	users, err := s.db.GetUsers(context.Background())
+	if err != nil {
+		return fmt.Errorf("failed to get all users: %w", err)
+	}
+
+	for _, user := range users {
+		fmt.Printf("* %s", user.Name)
+		if user.Name == s.cfg.CurrentUserName {
+			fmt.Printf(" (current)")
+		}
+		fmt.Println()
+	}
 
 	return nil
 }
