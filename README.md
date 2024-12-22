@@ -1,4 +1,4 @@
-# Blog Aggregator aka gator
+# Blog Aggregator aka gator 🐊
 
 Gator is a Go-based CLI application for aggregating, browsing, and following RSS feeds. It is designed to simplify the consumption of blog and news content for users. This project uses PostgreSQL for database queries and supports user management and feed subscriptions.
 
